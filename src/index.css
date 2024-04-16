@@ -1,0 +1,11 @@
+@font-face {
+    font-family: "Pretendard";
+    src: url(../public/assets/font/PretendardVariable.woff2)format("woff2");
+}
+
+* {
+    font-family: 'Pretendar';
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
