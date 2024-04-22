@@ -24,3 +24,74 @@ export const color = {
     white: '#FFFFFF',
     black: '#000000'
 }
+
+export const fontSize = {
+    Headline:{
+        large:{
+            fontSize: '64px',
+            fontWeight: 700,
+            lineHeight: '72px'
+        },
+        medium:{
+            fontSize: '48px',
+            fontWeight: 700,
+            lineHeight: '52px'
+        },
+        small:{
+            fontSize: '40px',
+            fontWeight: 700,
+            lineHeight: '42px'
+        }
+    },
+    Title:{
+        large:{
+            fontSize: '32px',
+            fontWeight: 600,
+            lineHeight: '48px'
+        },
+        medium:{
+            fontSize: '24px',
+            fontWeight: 600,
+            lineHeight: '36px'
+        },
+        small:{
+            fontSize: '20px',
+            fontWeight: 600,
+            lineHeight: '32px'
+        }
+    },
+    Body:{
+        large:{
+            fontSize: '20px',
+            fontWeight: 500,
+            lineHeight: '28px'
+        },
+        medium:{
+            fontSize: '18px',
+            fontWeight: 400,
+            lineHeight: '26px'
+        },
+        small:{
+            fontSize: '16px',
+            fontWeight: 400,
+            lineHeight: '24px'
+        }
+    },
+    Label:{
+        large:{
+            fontSize: '14px',
+            fontWeight: 500,
+            lineHeight: '20px'
+        },
+        medium:{
+            fontSize: '14px',
+            fontWeight: 400,
+            lineHeight: '20px'
+        },
+        small:{
+            fontSize: '12px',
+            fontWeight: 400,
+            lineHeight: '16px'
+        }
+    }
+}
