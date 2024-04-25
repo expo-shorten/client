@@ -18,7 +18,7 @@ export const MainPage = () => {
         if (e !== null && e.length > 0) {
             const file = e[0];
             if (file !== null) {
-                setFile(e);
+                setFile(e[0]);
                 setInput(e[0].name);
                 setTitle(e[0].name);
                 const link = window.URL.createObjectURL(e[0])
@@ -38,6 +38,18 @@ export const MainPage = () => {
         setVideoState(false);
     }
 
+    const handleSummary = () => {
+        if (input) {
+            if (file) {
+                navigate('/summary', { state: { files: file } })
+            } else {
+                navigate('/summary', { state: { inputs: input } })
+            }
+        } else {
+            alert("유튜브 영상 및 영상 업로드를 해주세요.")
+        }
+    }
+
     return (
         <Section video={videoState}>
             <Title>영상 요약하기</Title>
@@ -45,7 +57,7 @@ export const MainPage = () => {
                 <VideoInput value={input} onChange={(e) => setInput(e.target.value)} placeholder="여기에 동영상 링크 붙여넣기" />
                 <UploadLabel htmlFor='file'>업로드</UploadLabel>
                 <UploadInput id="file" type='file' accept="video/*" onChange={(e) => handleLoading(e.target.files)} />
-                <Button onClick={() => navigate('/summary')}>요약</Button>
+                <Button onClick={handleSummary}>요약</Button>
             </InputFlex>
             <TextFlex>
                 <Span>유튜브</Span>
@@ -71,7 +83,7 @@ export const MainPage = () => {
                                         <VideoTitle>{title}</VideoTitle>
                                         <VideoClose onClick={handleClose} src="/assets/img/close.svg" />
                                     </VideoTitleFlex>
-                                    <VideoSummary onClick={() => navigate('/summary')}>요약하기</VideoSummary>
+                                    <VideoSummary onClick={handleSummary}>요약하기</VideoSummary>
                                 </VideoTimeFlex>
                             </VideoBox>
                         </VideoFlex>

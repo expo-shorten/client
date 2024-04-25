@@ -1,11 +1,13 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { styled } from "styled-components";
 import { color, fontSize } from "../styles/theme";
 
 export const Hedaer = () => {
+    const navigation = useNavigate()
+
     return (
         <Headers>
-            <img width={150} src="/assets/img/LongLogo.svg" />
+            <img width={150} src="/assets/img/LongLogo.svg" onClick={() => navigation('/')} />
             <GoInstall target={'_blank'} to={'https://chromewebstore.google.com/category/extensions?utm_source=ext_sidebar&hl=ko'}>설치</GoInstall>
         </Headers>
 
