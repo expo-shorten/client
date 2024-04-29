@@ -1,26 +1,46 @@
-import axios, { AxiosResponse } from "axios";
+import axios from "axios";
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { styled } from "styled-components";
 import { color, fontSize } from "../../styles/theme";
 
 const BASEURL = process.env.REACT_APP_BASE_URL;
 
+interface TotalType {
+    que: string;
+    sum: string;
+}
+
 export const SummaryPage = () => {
 
     const { state } = useLocation();
     const { files, inputs } = state;
-    const [summaryData, setSummaryData] = useState<string[]>([]);
+
+    // 웹 렌더링 구조: 페이지 넘어오면 로딩 -> 원본 / 요약 -> 추가 질문 -> 로딩 -> 질문 응답
+
+    // 원본 요약 데이터 저장
+    const [originalSummaryData, setOriginalSummaryData] = useState("");
+    // 원본데이터 저장
     const [originalData, setOriginalData] = useState("");
+    // 로딩 상태관리
     const [loading, setLoading] = useState<boolean>(false);
+    // 추가 질문 인풋 상태관리
     const [input, setInput] = useState<string>("");
+    // 질문 요약 모두 모아 보기
+    const [totalData, setTotalData] = useState<TotalType[]>([]);
+    // 질문
+    const [question, setQuestion] = useState<string | null>(null);
+    // 요약
+    const [summaryData, setSummaryData] = useState<string | null>(null);
+    // 질문 로딩
+    const [lastLoading, setLastLoging] = useState<boolean>(false);
 
     useEffect(() => {
-        setLoading(true)
         handleGetData()
-    }, [])
+    }, [files, inputs]);
 
     const handleGetData = async () => {
+        setLoading(true)
         try {
             if (files) {
                 let formdata = new FormData();
@@ -30,21 +50,15 @@ export const SummaryPage = () => {
                         "Contest-Type": "multipart/form-data"
                     }
                 });
-                console.log(data.data)
                 setLoading(false)
                 setOriginalData(data.data.response)
-                let copy = summaryData;
-                copy.push(data.data.summary)
-                setSummaryData(copy)
+                setOriginalSummaryData(data.data.summary)
             }
             else if (inputs) {
                 const data = await axios.post(`${BASEURL}/upload_url/`, { url: inputs })
-                console.log(data.data)
                 setLoading(false)
                 setOriginalData(data.data.response)
-                let copy = summaryData;
-                copy.push(data.data.summary)
-                setSummaryData(copy)
+                setOriginalSummaryData(data.data.summary)
             }
 
         }
@@ -52,17 +66,38 @@ export const SummaryPage = () => {
             console.log("에러가 발생하였습니다.");
             console.log(err)
         }
-
     }
 
     const handleKeyDown = (e: any) => {
         if (e.key === 'Enter') {
+            if (e.nativeEvent.isComposing) return
+            if (question) {
+                if (summaryData) {
+                    let copy = totalData
+                    copy.push({ que: question, sum: summaryData })
+                    setTotalData(copy)
+                    setQuestion(null)
+                    setSummaryData(null)
+                }
+            }
+            console.log(e.target.value)
+            setQuestion(e.target.value)
+            setSummaryData("123")
+            setLastLoging(true)
             handleQuestion();
+            e.target.value = ''
         }
     }
 
     const handleQuestion = async () => {
-        await axios.post('')
+        try {
+            const data = await axios.post(`${BASEURL}/message_req`, { summary: originalSummaryData, question: question })
+            setLastLoging(false)
+            setSummaryData(data.data.response)
+        }
+        catch (err) {
+            console.error(err)
+        }
     }
 
     const handleCopyText = (e: number) => {
@@ -70,18 +105,24 @@ export const SummaryPage = () => {
             navigator.clipboard.writeText(originalData);
         }
         if (e == 2) {
-            navigator.clipboard.writeText(summaryData[0]);
+            navigator.clipboard.writeText(originalSummaryData);
+        }
+        if (e == 3) {
+            if (summaryData) navigator.clipboard.writeText(summaryData);
         }
     }
 
     const handleDownloadText = (e: number) => {
-        let fileName = '파일이름.txt';
+        let fileName = '요약.txt';
         let output = "";
         if (e == 1) {
             output = originalData;
         }
         if (e == 2) {
-            output = summaryData[0];
+            output = originalSummaryData;
+        }
+        if (e == 3) {
+            if (summaryData) output = summaryData;
         }
         const file = new Blob([output], {
             type: 'text/plain',
@@ -97,6 +138,7 @@ export const SummaryPage = () => {
     return (
         <Section>
             <TextFlex>
+                {/* 원본과 원본 요약 코드 */}
                 <AIText>
                     <Logo src="/assets/img/LongLogo.svg" />
                     {
@@ -109,15 +151,13 @@ export const SummaryPage = () => {
                             </>
                             :
                             <>
-                                <Content readOnly>
-                                    {originalData}
+                                <Content readOnly defaultValue={originalData}>
                                 </Content>
                                 <IconFlex>
                                     <Icon onClick={() => handleDownloadText(1)} src="/assets/img/Download.svg" />
                                     <Icon onClick={() => handleCopyText(1)} src="/assets/img/Copy.svg" />
                                 </IconFlex>
-                                <Content readOnly>
-                                    {summaryData[0]}
+                                <Content readOnly defaultValue={originalSummaryData}>
                                 </Content>
                                 <IconFlex>
                                     <Icon onClick={() => handleDownloadText(2)} src="/assets/img/Download.svg" />
@@ -126,23 +166,78 @@ export const SummaryPage = () => {
                             </>
                     }
                 </AIText>
-                {/* <MyText>
-                    <MyFlex>
-                        <My>나</My>
-                    </MyFlex>
-                    <MyContentContainer>
-                        <MyContentFlex>
-                            <MyContent>
-                                엄준식에 대해 말해줘 히히 엄준식에 대해 말해줘 히히엄준식에 대해 말해줘 히히엄준식에 대해 말해줘 히히엄준식에 대해 말해줘 히히엄준식에 대해 말해줘 히히엄준식에 대해 말해줘 히히엄준식에 대해 말해줘 히히엄준식에 대해 말해줘 히히엄준식에 대해 말해줘 히히엄준식에 대해 말해줘 히히엄준식에 대해 말해줘 히히엄준식에 대해 말해줘 히히
-                            </MyContent>
-                        </MyContentFlex>
-                    </MyContentContainer>
-                </MyText> */}
+                <>
+                    {totalData &&
+                        totalData.map((qq) => {
+                            <MyText>
+                                <MyFlex>
+                                    <My>나</My>
+                                </MyFlex>
+                                <MyContentContainer>
+                                    <MyContentFlex>
+                                        <MyContent>
+                                            {qq.que}
+                                        </MyContent>
+                                    </MyContentFlex>
+                                </MyContentContainer>
+                            </MyText>
+                            {/* 질문 요약 */ }
+                            <AIText>
+                                <Logo src="/assets/img/LongLogo.svg" />
+                                <Content readOnly defaultValue={qq.sum}>
+                                </Content>
+                                <IconFlex>
+                                    <Icon onClick={() => handleDownloadText(2)} src="/assets/img/Download.svg" />
+                                    <Icon onClick={() => handleCopyText(2)} src="/assets/img/Copy.svg" />
+                                </IconFlex>
+                            </AIText>
+                        })
+                    }
+                </>
+                <>
+                    {
+                        question &&
+                        <MyText>
+                            <MyFlex>
+                                <My>나</My>
+                            </MyFlex>
+                            <MyContentContainer>
+                                <MyContentFlex>
+                                    <MyContent>
+                                        {question}
+                                    </MyContent>
+                                </MyContentFlex>
+                            </MyContentContainer>
+                        </MyText>
+                    }
+                    {/* 질문 요약 */}
+                    {
+                        summaryData &&
+                        <AIText>
+                            <Logo src="/assets/img/LongLogo.svg" />
+                            {
+                                lastLoading ?
+                                    <>
+                                        <LoadingFlex>
+                                            <LoadingTxt>요약할 영상을 처리하고 있습니다.</LoadingTxt>
+                                            <LoadingImg src="/assets/img/Spinner.gif" />
+                                        </LoadingFlex>
+                                    </>
+                                    :
+                                    <>
+                                        <Content readOnly defaultValue={summaryData}>
+                                        </Content>
+                                    </>
+                            }
+
+                        </AIText>
+                    }
+                </>
             </TextFlex>
-            {/* <InputFlex>
-                <Input value={input} onChange={(e) => setInput(e.target.value)} placeholder="추가 적인 내용을 원하시면 질문해주세요" onKeyDown={handleKeyDown} />
-                <QuestionBtn src="/assets/img/Question.svg" onClick={handleQuestion} />
-            </InputFlex> */}
+            <InputFlex>
+                <Input placeholder="추가 적인 내용을 원하시면 질문해주세요" onKeyDown={handleKeyDown} />
+                <QuestionBtn src="/assets/img/Question.svg" />
+            </InputFlex>
         </Section>
     );
 }
@@ -153,7 +248,7 @@ const Section = styled.section`
     align-items: center;
     width: 100%;
     min-width: 1000px;
-    height: calc(100vh - 10vh);
+    height: calc(100vh - 12vh);
     gap: 50px;
 `;
 
@@ -225,6 +320,7 @@ const LoadingImg = styled.img`
 const Content = styled.textarea`
     padding: 16px 24px;
     background-color: ${color.white};
+    outline: none;
     width: 100%;
     height: 400px;
     resize: none;

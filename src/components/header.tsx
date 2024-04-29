@@ -8,7 +8,7 @@ export const Hedaer = () => {
     return (
         <Headers>
             <img width={150} src="/assets/img/LongLogo.svg" onClick={() => navigation('/')} />
-            <GoInstall target={'_blank'} to={'https://chromewebstore.google.com/category/extensions?utm_source=ext_sidebar&hl=ko'}>설치</GoInstall>
+            {/* <GoInstall target={'_blank'} to={'https://chromewebstore.google.com/category/extensions?utm_source=ext_sidebar&hl=ko'}>설치</GoInstall> */}
         </Headers>
 
     );

@@ -60,11 +60,23 @@ export const MainPage = () => {
                 <Button onClick={handleSummary}>요약</Button>
             </InputFlex>
             <TextFlex>
-                <Span>유튜브</Span>
-                <Txt>영상 및 각 종 </Txt>
-                <div style={{ display: "flex" }}>
-                    <Span>영상</Span>
-                    <Txt>에 주요 내용을 내용을 요약해 줍니다! 간편하게 요약한 내용에 대해 질문해보세요!!</Txt>
+                <div style={{ display: "flex", gap: "8px" }}>
+                    <Span>유튜브</Span>
+                    <Txt>영상 및 각 종 </Txt>
+                    <div style={{ display: "flex" }}>
+                        <Span>영상</Span>
+                        <Txt>에 주요 내용을 내용을 요약해 줍니다! 간편하게 요약한 내용에 대해 질문해보세요!!</Txt>
+                    </div>
+                </div>
+                <div style={{ display: "flex", gap: "8px" }}>
+                    <div style={{ display: "flex" }}>
+                        <Span>요약</Span>
+                        <Txt>된 정보는</Txt>
+                    </div>
+                    <div style={{ display: "flex" }}>
+                        <Span>데이터 베이스</Span>
+                        <Txt>에 저장되지 않습니다. 그 부분은 유의해주시고 이용해주시기 바랍니다.</Txt>
+                    </div>
                 </div>
             </TextFlex>
             {videoState &&
@@ -100,7 +112,7 @@ const Section = styled.section<{ video: boolean }>`
     align-items: center;
     width: 100%;
     min-width: 1000px;
-    height: ${({ video }) => video ? '100vh' : 'calc(100vh - 105px)'};
+    height: ${({ video }) => video ? '100vh' : 'calc(100vh - 90px)'};
 `;
 
 const Title = styled.p`
@@ -192,6 +204,7 @@ const Button = styled.button`
 
 const TextFlex = styled.div`
     display: flex;
+    flex-direction: column;
     gap: 8px;
     width: 70%;
     min-width: 700px;
